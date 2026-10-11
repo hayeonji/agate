@@ -210,7 +210,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
   const CONTRAST = 1.12;     // 표본 무늬 대비 (1 = 원본). 선명하게
   const SATURATION = 1.45;   // 표본 채도 배율 (1 = 원본 이미지 그대로)
   const GAP = 1.6;   // 문장 사이 간격 (em)
-  const LINE = 2.0;  // 갈라진 뒤 줄 간격 (줄어든 글자 크기의 배수). 모든 줄을 같은 간격으로 쌓아 한 덩어리처럼
+  const LINE = 1.5;  // 갈라진 뒤 줄 간격 (줄어든 글자 크기의 배수). 모든 줄을 같은 간격으로 쌓아 한 덩어리처럼
   const SEGS = [
     { t: '다섯 가지 마노에 관한 기록', b: 1, kr: 1, center: 1, row: 0, x0: .432, to: [.436, .047] },
     { t: '이곳에는 서로 다른 무늬를 지닌 다섯 개의 마노가 기록되어 있습니다.', kr: 1, row: 1, x0: .234, to: [.502, .072] },
@@ -299,8 +299,8 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
     }
     const S = SPLIT_S();
     const kr = segEls.filter(g => g.s.kr), en = segEls.filter(g => !g.s.kr && !g.s.after);
-    const stepK = parseFloat(getComputedStyle(kr[0].el).fontSize) * S * LINE;
-    const stepE = parseFloat(getComputedStyle(en[0].el).fontSize) * S * LINE;
+    const fsMax = Math.max(parseFloat(getComputedStyle(kr[0].el).fontSize), parseFloat(getComputedStyle(en[0].el).fontSize));
+    const stepK = fsMax * S * LINE, stepE = stepK;   // 한글 · 영문 모두 같은 줄 간격 (촘촘한 한 덩어리)
     segEls.forEach((g, k) => {
       const w = g.el.offsetWidth * S, h = g.el.offsetHeight * S;
       if (g.s.after) {                     // 앞 줄 끝에 이어서
@@ -311,7 +311,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
       g.tx = Math.max(12, Math.min(g.s.to[0] * W, W - w - 12));
       // 한글은 첫 줄(.047)에서 아래로, 영문은 마지막 줄(.958)에서 위로, 같은 간격으로 쌓음
       const cy = g.s.kr ? .047 * H + kr.indexOf(g) * stepK : .958 * H - (en.length - 1 - en.indexOf(g)) * stepE;
-      g.ty = cy - h / 2;
+      g.ty = cy - h / 2 - (w / 2) * Math.sin((g.rot || 0) * Math.PI / 180);   // 기울어진 줄도 가운데 높이가 같은 간격에 오도록
     });
     // 갈라진 뒤 정렬: 제목은 가운데 · endNext는 다음 줄과 끝(오른쪽)을 맞춤 · alignNext는 다음 줄과 시작(왼쪽)을 맞춤 (뒤에서부터)
     const wOf = g => g.el.offsetWidth * S;
@@ -461,12 +461,12 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
   })();
 
   const stones = [];
-  const stoneR = () => Math.max(26, Math.min(VW, VH) * 0.048);
+  const stoneR = () => Math.max(26, Math.min(VW, VH) * 0.043);   // 살짝 작게
   const loadImage = src => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
   const ready = Promise.all(SAMPLES.map(s => loadImage(ASSETS[s.sampleId]))).then(imgs => {
     SAMPLES.forEach((s, i) => {
       const tex = new THREE.Texture(imgs[i]); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = renderer.capabilities.getMaxAnisotropy(); tex.needsUpdate = true;
-      const mat = new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.38, metalness: 0, clearcoat: 1.0, clearcoatRoughness: 0.08, envMapIntensity: 0.75 });   // 유광: 매끈한 코팅 + 또렷한 반사
+      const mat = new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.2, metalness: 0, clearcoat: 1.0, clearcoatRoughness: 0.02, envMapIntensity: 0.75 });   // 유광: 바니시 바른 듯 매끈한 코팅 + 또렷한 반사
       mat.onBeforeCompile = sh => {              // 표본 채도 올림 (SATURATION: 1 = 원본)
         sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>',
           '#include <map_fragment>\n{ float l = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722)); diffuseColor.rgb = max(mix(vec3(l), diffuseColor.rgb, ' + SATURATION.toFixed(2) + '), 0.0); diffuseColor.rgb = clamp((diffuseColor.rgb - 0.5) * ' + CONTRAST.toFixed(2) + ' + 0.5, 0.0, 1.0); }');
@@ -491,12 +491,12 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
     const R = stoneR();
     stones.forEach(st => st.mesh.scale.setScalar(R));
     if (keep) return;
-    const cx = VW * 0.5, cy = VH * 0.53, rx = Math.max(VW * 0.12, R * 3.6), ry = Math.max(VH * 0.13, R * 3.2);
+    const cx = VW * 0.5, cy = VH * 0.53, rx = Math.max(VW * 0.085, R * 3.1), ry = Math.max(VH * 0.1, R * 2.7);   // 더 모이게
     const pts = [];
     stones.forEach((st, i) => {
       let p, tries = 0;
       do { const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()); p = [cx + Math.cos(a) * r * rx, cy + Math.sin(a) * r * ry]; tries++; }
-      while (tries < 400 && pts.some(q => Math.hypot(q[0] - p[0], q[1] - p[1]) < R * 2.7));
+      while (tries < 400 && pts.some(q => Math.hypot(q[0] - p[0], q[1] - p[1]) < R * 2.45));
       pts.push(p); st.u = p[0] / VW; st.v = p[1] / VH;
       st.qFinal = new THREE.Quaternion().setFromEuler(new THREE.Euler((Math.random() - .5) * 0.3, (Math.random() - .5) * 0.3, Math.random() * 6.28));
     });
@@ -504,7 +504,8 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
   const homeOf = st => [st.u * VW, st.v * VH];
 
   // ── 던지기: 화면 밖에서 굴러 들어와 마찰로 멈춤 ─────────────────────
-  const THROW = 1.25;
+  const THROW = 1.35;
+  const DROP = { C: .95 };   // 출발 높이: 1에 가까울수록 카메라 바로 앞을 지나 더 크게 시작 (원근감)
   function throwStones() {
     ready.then(() => {
       canvas.classList.add('on');
@@ -921,18 +922,24 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
         const [hx, hy] = homeOf(st);
         if (t <= 0) { all = false; st.mesh.visible = false; return; }
         st.mesh.visible = true;
+        // 탑뷰 그대로 카메라보다 훨씬 위에서 z축으로 떨어짐 → 바닥에 닿아 한 번 작게 튀고 멈춤
         const p = Math.min(1, t), e = easeOut3(p);
-        const x = st.start[0] + (hx - st.start[0]) * e, y = st.start[1] + (hy - st.start[1]) * e;
-        const air = Math.sin(Math.PI * Math.min(1, p / 0.55)) * (p < 0.55 ? 1 : 0);   // 공중에 떴다가 바닥에 닿음
-        if (p >= 0.55 && !st.landed) { st.landed = true; kickBoard(x, y); }
-        const [qx, qy, qf] = proj(x, y);
-        st.mesh.position.copy(S(qx, qy)); st.mesh.position.z = 200 * air;
-        st.mesh.scale.setScalar(stoneR() * (1 + 0.28 * air) * qf);
-        qTmp.setFromAxisAngle(st.axis, st.spin * (1 - e));
+        const FALL = 0.66, f = Math.min(1, p / FALL);
+        const h = p < FALL ? 1 - f * f : (p < 0.82 ? 0.1 * Math.sin(Math.PI * (p - FALL) / (0.82 - FALL)) : 0);   // 높이 1 → 0 (중력처럼 갈수록 빨라짐)
+        if (p >= FALL && !st.landed) { st.landed = true; kickBoard(hx, hy); }
+        const [qx, qy, qf] = proj(hx, hy);
+        // 원근: 카메라보다 훨씬 위(뒤)에서 출발 → 카메라에 가까울수록 크고, 화면 가운데에서 멀리 밀려 보임
+        const s = 1 / (1 - DROP.C * h), sx = VW / 2 + (qx - VW / 2) * s, sy = VH / 2 + (qy - VH / 2) * s;
+        st.mesh.position.copy(S(sx, sy)); st.mesh.position.z = 600 * h;
+        st.mesh.scale.setScalar(stoneR() * s * qf);
+        const op = Math.min(1, (1 - h) * 4);                                   // 카메라를 지나오는 동안엔 보이지 않다가 나타남
+        st.mesh.material.transparent = op < 1; st.mesh.material.opacity = op;
+        qTmp.setFromAxisAngle(st.axis, st.spin * (1 - e) * 0.6);
         st.mesh.quaternion.copy(st.qFinal).premultiply(qTmp);
-        st.sh.position.set(qx + stoneR() * (0.15 + 0.5 * air), -(qy + stoneR() * (0.25 + 0.6 * air)), -900);
-        st.sh.scale.set(stoneR() * (2.7 + 1.2 * air), stoneR() * (2.2 + 1 * air), 1);
-        st.sh.material.opacity = 0.9 * (1 - 0.6 * air) * Math.min(1, p * 3);
+        // 그림자: 높을 때는 넓고 옅게 (빛 방향으로 밀림), 닿을수록 작고 진하게 모임
+        st.sh.position.set(qx + stoneR() * (0.15 + 1.4 * h), -(qy + stoneR() * (0.25 + 1.6 * h)), -900);
+        st.sh.scale.set(stoneR() * (2.7 + 2.2 * h), stoneR() * (2.2 + 1.8 * h), 1);
+        st.sh.material.opacity = 0.9 * (1 - 0.75 * h) * Math.min(1, p * 3);
         if (p < 1) all = false;
       });
       if (all) {
