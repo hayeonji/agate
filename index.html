@@ -326,14 +326,14 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
 
   let phase = 'opening', revealed = false;
   // 퇴적 설정: 문장이 써지는 간격 · 한 줄이 다 써진 뒤 눌리기까지 · 눌림 정도 · 줄(row)마다 기울기(도)
-  const DEP = { FIRST: 250, STEP: 170, LAND: 200, FOLD_MS: 450, PRESS: .035, SQUASH: .04, FADE: .07,
-    TILT: [-1.3, -.8, -.3, .25, .8, 1.35], rows: 6, dropAt: [], foldAt: 0, end: 0 };   // TILT: 위에서 아래로 조금씩 각도가 바뀌어 부채꼴로 휘어짐
+  const DEP = { FIRST: 250, STEP: 170, LAND: 200, FOLD_MS: 450, PRESS: .06, SQUASH: .09, FADE: 0,   // 지층 효과 (강하게)
+    TILT: [-2.4, -1.5, -.6, .4, 1.1, 1.9], rows: 6, dropAt: [], foldAt: 0, end: 0 };   // TILT: 위에서 아래로 조금씩 각도가 바뀌어 부채꼴로 휘어짐
   function depositTargets(now) {               // 지금 시점에 각 줄이 있어야 할 자리 · 눌림 · 기울기
     const rows = DEP.rows, top = [], landed = [];
     for (let r = 0; r < rows; r++) { top[r] = Math.min(...segEls.filter(g => g.s.row === r).map(g => g.oy)); landed[r] = now >= DEP.rowDone[r]; }
     const above = r => { let n = 0; for (let j = 0; j < r; j++) if (landed[j]) n++; return n; };   // 이 줄 위에 쌓인 줄 수
     const y = []; y[rows - 1] = top[rows - 1];
-    for (let r = rows - 2; r >= 0; r--) y[r] = y[r + 1] - (top[r + 1] - top[r]) * Math.max(.78, 1 - DEP.PRESS * above(r + 1));
+    for (let r = rows - 2; r >= 0; r--) y[r] = y[r + 1] - (top[r + 1] - top[r]) * Math.max(.6, 1 - DEP.PRESS * above(r + 1));
     const k = now <= DEP.foldAt ? 0 : Math.min(1, (now - DEP.foldAt) / DEP.FOLD_MS), fold = k * k * (3 - 2 * k);
     return { y, top, above, fold };
   }   // opening → split → browse → observe → dive → question → loading
@@ -891,8 +891,8 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
           g.x += g.vx * dt; g.y += g.vy * dt; g.rot += (a - g.rot) * Math.min(1, dt * 18);
         }
         const n = T.above(r), sp = g.el.firstChild;
-        sp.style.setProperty('--sy', Math.max(.72, 1 - DEP.SQUASH * n).toFixed(3));
-        sp.style.opacity = Math.max(.55, 1 - DEP.FADE * n).toFixed(3);
+        sp.style.setProperty('--sy', Math.max(.55, 1 - DEP.SQUASH * n).toFixed(3));
+        sp.style.opacity = Math.max(.4, 1 - DEP.FADE * n).toFixed(3);
         put(g);
       });
       if (now < DEP.end + 600) busy = true;
