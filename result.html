@@ -406,7 +406,8 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
     return josa(w) === '은' ? '을' : '를';
   }
   const FEAT = pickFeature(answer);
-  const SPOT = FEATURES[id] ? FEATURES[id][FEAT || 'A'] : null;   // 스포트라이트 · 답을 쓸 자리
+  const SPOT = FEATURES[id] ? FEATURES[id][FEAT || 'A'] : null;
+  const SHOW_TAG = false;   // 스포트라이트 자리에 관람객의 답을 쓸지 (지금은 끔: 스포트라이트만)   // 스포트라이트 · 답을 쓸 자리
   if (FEATURES[id]) D.interp[0] = FEAT ? FEATURES[id][FEAT].text : FEATURES[id].none.replace('{O}', '‘' + shortA + '’' + josaObj(shortA));
   document.title = D.ko + ' · 다섯 가지 마노의 기록';
 
@@ -634,7 +635,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
   function finishWriting() {
     timers.forEach(clearTimeout); timers = [];
     writingBlocks.forEach(b => b.lines.forEach(L => L.on()));
-    if (stage === 1 && SPOT) $('tag').classList.add('on');
+    if (stage === 1 && SPOT && SHOW_TAG) $('tag').classList.add('on');
     writeEnd = performance.now();
   }
   const writing = () => performance.now() < writeEnd;
@@ -655,7 +656,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
       $('spot').style.background = 'radial-gradient(circle at ' + (SPOT.pt[0] * 100) + '% ' + (SPOT.pt[1] * 100) + '%, rgba(0,0,0,0) 0, rgba(0,0,0,0) ' + (17 / SPOT.z * 1.6).toFixed(1) + '%, rgba(0,0,0,.72) ' + (30 / SPOT.z * 1.6).toFixed(1) + '%)';
       $('spot').classList.add('on');
       const tg = $('tag'); tg.textContent = shortA; tg.classList.remove('off'); layout();
-      timers.push(setTimeout(() => tg.classList.add('on'), reduced ? 0 : 1300));
+      if (SHOW_TAG) timers.push(setTimeout(() => tg.classList.add('on'), reduced ? 0 : 1300));
     }
     if (n >= 2) { $('spot').classList.remove('on'); $('tag').classList.add('off'); }
     if (n === 2) {
