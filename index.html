@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>다섯 가지 마노에 관한 기록</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="vendor/fonts.css">
 <style>
 /* Layout: 흰 화면 한 장. 지층 같은 글줄 → 갈라짐 → 가운데 표본 → 관찰 → GIF 속으로 → 질문. */
@@ -27,28 +30,28 @@ body { margin: 0; background: var(--page); color: var(--ink); font-family: var(-
 /* 지층 글줄 */
 .seg {
   position: fixed; left: 0; top: 0; margin: 0; z-index: 3;
-  font-size: var(--fs-kr); line-height: 1.6; font-weight: 400; white-space: nowrap; color: var(--ink);
+  font-size: var(--fs-kr); line-height: 1.6; font-weight: 600; white-space: nowrap; color: var(--ink);   /* 한글 본문 굵기 600 */
   will-change: transform, clip-path; pointer-events: none;
   clip-path: inset(0 100% 0 0);
   transition: opacity .6s ease;
 }
-.seg.b { font-weight: 700; }
+.seg.b { font-weight: 800; font-size: calc(var(--fs-kr) + 2.67px); }   /* 한글 제목: 원래보다 2pt 크고 굵게 */
 .seg:lang(ko) { letter-spacing: -.012em; }
-.seg:lang(en) { font-family: var(--f-en); font-size: var(--fs-en); font-weight: 300; }
-.seg.b:lang(en) { font-weight: 600; }
+.seg:lang(en) { font-family: var(--f-en); font-size: calc(var(--fs-en) - 1.33px); font-weight: 600; }   /* 영문 본문: 1pt 작게 */
+.seg.b:lang(en) { font-weight: 800; font-size: calc(var(--fs-en) + 4px); letter-spacing: .02em; }   /* 영어 제목 자간 0.02em */
 
 /* 마노에 대하여 · About Agate: 호버하면 획이 두꺼워짐 */
 .about { position: fixed; top: 50%; z-index: 4; transform: translateY(-50%); color: var(--ink); text-decoration: none;
   font-weight: 500; opacity: 0; pointer-events: none; transition: font-weight .35s ease, opacity .6s ease; }
-.about.en { left: clamp(12px, 1.3vw, 24px); font-family: var(--f-en); font-size: var(--fs-en); letter-spacing: .02em; }
-.about.kr { right: clamp(12px, 2vw, 36px); font-size: var(--fs-kr); }
+.about.en { left: clamp(12px, 1.3vw, 24px); font-family: var(--f-en); font-size: calc(var(--fs-en) + 4px); font-weight: 800; letter-spacing: .02em; }   /* 영문 제목과 같은 크기·굵기 */
+.about.kr { right: clamp(12px, 2vw, 36px); font-size: calc(var(--fs-kr) + 2.67px); font-weight: 800; }   /* 한글 제목과 같은 크기·굵기 */
 .app.is-browse .about { opacity: 1; pointer-events: auto; }
 .about:hover, .about:focus-visible { font-weight: 900; -webkit-text-stroke: .7px currentColor; outline: none; }
 .about:focus-visible { text-decoration: underline; text-underline-offset: 5px; }
 
 /* 모눈종이: 가장 뒤 (표본보다 뒤), 카메라와 함께 확대됨 */
 .grid { position: fixed; left: 0; top: 0; z-index: 1; transform-origin: 0 0; pointer-events: none; opacity: 0; transition: opacity .8s ease; }
-.grid.on { opacity: .7; }   /* 모눈종이 투명도 70% */
+.grid.on { opacity: .9; }   /* 모눈종이 불투명도 90% */
 .app.is-question .grid { opacity: 0; }
 .seg { transform-origin: 0 0; }
 .seg.dropped { clip-path: none; }   /* 오프닝: 써지지 않고 위에서 떨어져 쌓임 */
@@ -225,7 +228,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
     { t: 'Agate forms as layers of minerals build up over time.', row: 4, x0: .012, to: [.148, .862] },
     { t: 'The way these layers form gives each agate its own colors and patterns.', row: 4, to: [.148, .889] },
     { t: 'To learn more about agate, select ‘About Agate’ on either side.', row: 4, to: [.287, .934] },
-    { t: 'Five Notes on Agate Patterns', b: 1, center: 1, row: 5, x0: .368, to: [.358, .958] }
+    { t: 'FIVE NOTES on AGATE PATTERNS', b: 1, center: 1, row: 5, x0: .368, to: [.358, .958] }
   ];
   const ROW_Y = [.442, .487, .516, .561, .591, .620];   // 오프닝 줄 높이 (화면 비율)
 
@@ -250,7 +253,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
 
   function layoutOpening() {
     const W = innerWidth, H = innerHeight;
-    const em = parseFloat(getComputedStyle(segEls[0].el).fontSize);
+    const em = parseFloat(getComputedStyle(segEls[1].el).fontSize);   // 본문 크기 기준 (제목이 커져도 줄 배치 유지)
     const lineH = em * 1.6;
     const rows = {};
     segEls.forEach(g => { (rows[g.s.row] = rows[g.s.row] || []).push(g); });
@@ -299,8 +302,8 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
     }
     const S = SPLIT_S();
     const kr = segEls.filter(g => g.s.kr), en = segEls.filter(g => !g.s.kr && !g.s.after);
-    const fsMax = Math.max(parseFloat(getComputedStyle(kr[0].el).fontSize), parseFloat(getComputedStyle(en[0].el).fontSize));
-    const stepK = fsMax * S * LINE, stepE = stepK;   // 한글 · 영문 모두 같은 줄 간격 (촘촘한 한 덩어리)
+    const fsMax = Math.max(parseFloat(getComputedStyle(kr[1].el).fontSize), parseFloat(getComputedStyle(en[0].el).fontSize));
+    const stepE = fsMax * S * LINE, stepK = stepE + 1.33;   // 한글 줄 간격만 1pt 더 넓게   // 한글 · 영문 모두 같은 줄 간격 (촘촘한 한 덩어리)
     segEls.forEach((g, k) => {
       const w = g.el.offsetWidth * S, h = g.el.offsetHeight * S;
       if (g.s.after) {                     // 앞 줄 끝에 이어서
@@ -311,7 +314,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
       g.tx = Math.max(12, Math.min(g.s.to[0] * W, W - w - 12));
       // 한글은 첫 줄(.047)에서 아래로, 영문은 마지막 줄(.958)에서 위로, 같은 간격으로 쌓음
       const cy = g.s.kr ? .047 * H + kr.indexOf(g) * stepK : .958 * H - (en.length - 1 - en.indexOf(g)) * stepE;
-      g.ty = cy - h / 2 - (w / 2) * Math.sin((g.rot || 0) * Math.PI / 180);   // 기울어진 줄도 가운데 높이가 같은 간격에 오도록
+      g.ty = cy - h / 2;   // 갈라진 뒤에는 기울기 없이 모든 줄을 같은 간격으로
     });
     // 갈라진 뒤 정렬: 제목은 가운데 · endNext는 다음 줄과 끝(오른쪽)을 맞춤 · alignNext는 다음 줄과 시작(왼쪽)을 맞춤 (뒤에서부터)
     const wOf = g => g.el.offsetWidth * S;
@@ -326,7 +329,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
 
   let phase = 'opening', revealed = false;
   // 퇴적 설정: 문장이 써지는 간격 · 한 줄이 다 써진 뒤 눌리기까지 · 눌림 정도 · 줄(row)마다 기울기(도)
-  const DEP = { FIRST: 250, STEP: 170, LAND: 200, FOLD_MS: 450, PRESS: .06, SQUASH: .09, FADE: 0,   // 지층 효과 (강하게)
+  const DEP = { FIRST: 250, STEP: 110, LAND: 200, FOLD_MS: 450, PRESS: .06, SQUASH: .09, FADE: 0,   // 지층 효과 (강하게)
     TILT: [-2.4, -1.5, -.6, .4, 1.1, 1.9], rows: 6, dropAt: [], foldAt: 0, end: 0 };   // TILT: 위에서 아래로 조금씩 각도가 바뀌어 부채꼴로 휘어짐
   function depositTargets(now) {               // 지금 시점에 각 줄이 있어야 할 자리 · 눌림 · 기울기
     const rows = DEP.rows, top = [], landed = [];
@@ -367,7 +370,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
     if (phase !== 'opening') return;
     phase = 'split';
     app.classList.add('is-split');
-    segEls.forEach(g => { g.el.classList.add('on', 'dropped'); const sp = g.el.firstChild; sp.style.setProperty('--sy', 1); sp.style.opacity = ''; });   // 눌림은 풀고 기울기는 유지
+    segEls.forEach(g => { g.el.classList.add('on', 'dropped'); const sp = g.el.firstChild; sp.style.setProperty('--sy', 1); sp.style.opacity = ''; });   // 눌림은 풀고, 기울기는 갈라지면서 펴짐
     layoutSplit();
     const order = segEls.slice().sort((a, b) => Math.abs(a.oy - innerHeight / 2) - Math.abs(b.oy - innerHeight / 2));
     order.forEach((g, k) => { g.delay = k * 0.028; });
@@ -423,18 +426,23 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
   function makeCeramic(seed) {
     const rnd = seeded(seed), harm = [];
     [[1, .05], [2, .07], [3, .05], [4, .04], [5, .03], [7, .018], [9, .01]].forEach(([k, a]) => harm.push([k, a * (0.6 + rnd() * 0.8), rnd() * 6.28]));
-    const sx = 1.12 + rnd() * 0.18, sy = 0.84 + rnd() * 0.12, tTop = 0.3 + rnd() * 0.06, tBot = 0.16 + rnd() * 0.04;
+    const sx = 1.12 + rnd() * 0.18, sy = 0.84 + rnd() * 0.12, tTop = (0.3 + rnd() * 0.06) * 1.6, tBot = (0.16 + rnd() * 0.04) * 1.6;   // 두께: 원래보다 1.6배 통통하게
     const tiltX = (rnd() - 0.5) * 0.5, tiltY = (rnd() - 0.5) * 0.4, lumps = [];
     for (let k = 0; k < 6; k++) lumps.push([(rnd() - .5) * 1.6, (rnd() - .5) * 1.1, (k < 2 ? -1 : 1) * (0.025 + rnd() * 0.04), 0.08 + rnd() * 0.14]);
-    const rim = th => { let r = 1; for (const [k, a, p] of harm) r += a * Math.sin(k * th + p); return r; };
+    // 돌다운 윤곽: 한쪽으로 치우친 비대칭 + 잔 굴곡
+    const asym = .07 * (0.6 + rnd() * 0.8), asymDir = rnd() * 6.28;
+    [[11, .012], [14, .009], [19, .006]].forEach(([k, a]) => harm.push([k, a * 1 * (0.5 + rnd()), rnd() * 6.28]));
+    const chips = [];   // 깨진 모서리 없음 (매끈한 조약돌)
+    const rim0 = th => { let r = 1 + asym * Math.cos(th - asymDir); for (const [k, a, p] of harm) r += a * Math.sin(k * th + p); return r; };
+    const rim = th => { let r = rim0(th); for (const [c, d] of chips) { const q = Math.cos(th - c); if (q > 0) r = Math.min(r, d * rim0(c) / q); } return r; };
     const sgnPow = (v, e) => Math.sign(v) * Math.pow(Math.abs(v), e);
     const NT = 112, NP = 40, P = []; let maxX = 0, maxY = 0;
     for (let j = 0; j <= NP; j++) {
       const ph = -Math.PI / 2 + (j / NP) * Math.PI, cp = Math.cos(ph), sp = Math.sin(ph);
       for (let i = 0; i < NT; i++) {
-        const th = (i / NT) * Math.PI * 2, r = rim(th), rad = r * Math.pow(Math.max(cp, 0), 0.24);
+        const th = (i / NT) * Math.PI * 2, r = rim(th), rad = r * Math.pow(Math.max(cp, 0), 0.32);   // 윗면을 조금 더 둥글게
         const x = rad * Math.cos(th) * sx, y = rad * Math.sin(th) * sy;
-        let z = sgnPow(sp, 0.55) * (sp > 0 ? tTop : tBot);
+        let z = sgnPow(sp, 0.7) * (sp > 0 ? tTop : tBot);
         if (sp > 0) { const w = Math.pow(sp, 0.6); z *= 1 + tiltX * x + tiltY * y; for (const [lx, ly, a, s2] of lumps) z += a * w * Math.exp(-((x - lx) ** 2 + (y - ly) ** 2) / s2); }
         else z *= 1 + 0.15 * Math.sin(th * 3 + seed);
         P.push([x, y, z]); maxX = Math.max(maxX, Math.abs(x)); maxY = Math.max(maxY, Math.abs(y));
@@ -452,6 +460,22 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
     g.setIndex(idx); g.computeVertexNormals();
     return g;
   }
+  // 돌 표면의 미세한 요철 (매끈한 플라스틱이 아니라 광물처럼 빛이 부서지게)
+  const stoneBump = (() => {
+    const N = 256, c = document.createElement('canvas'); c.width = c.height = N;
+    const x = c.getContext('2d'), im = x.createImageData(N, N), rnd = seeded(7);
+    const grid = (g) => { const a = []; for (let i = 0; i < g * g; i++) a.push(rnd()); return (u, v) => {
+      const X = u * g, Y = v * g, i0 = Math.floor(X), j0 = Math.floor(Y), fx = X - i0, fy = Y - j0, sm = t => t * t * (3 - 2 * t);
+      const at = (i, j) => a[((j % g + g) % g) * g + ((i % g + g) % g)];
+      return (at(i0, j0) * (1 - sm(fx)) + at(i0 + 1, j0) * sm(fx)) * (1 - sm(fy)) + (at(i0, j0 + 1) * (1 - sm(fx)) + at(i0 + 1, j0 + 1) * sm(fx)) * sm(fy); }; };
+    const o = [[grid(6), .45], [grid(16), .3], [grid(40), .17], [grid(96), .08]];
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      let v = 0; for (const [f, w] of o) v += f(i / N, j / N) * w;
+      const p = (j * N + i) * 4; im.data[p] = im.data[p + 1] = im.data[p + 2] = Math.round(v * 255); im.data[p + 3] = 255;
+    }
+    x.putImageData(im, 0, 0);
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+  })();
   const shadowTex = (() => {
     const c = document.createElement('canvas'); c.width = c.height = 128;
     const x = c.getContext('2d'), gr = x.createRadialGradient(64, 64, 4, 64, 64, 64);
@@ -466,7 +490,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
   const ready = Promise.all(SAMPLES.map(s => loadImage(ASSETS[s.sampleId]))).then(imgs => {
     SAMPLES.forEach((s, i) => {
       const tex = new THREE.Texture(imgs[i]); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = renderer.capabilities.getMaxAnisotropy(); tex.needsUpdate = true;
-      const mat = new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.2, metalness: 0, clearcoat: 1.0, clearcoatRoughness: 0.02, envMapIntensity: 0.75 });   // 유광: 바니시 바른 듯 매끈한 코팅 + 또렷한 반사
+      const mat = new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.2, metalness: 0, clearcoat: 1.0, clearcoatRoughness: 0.02, envMapIntensity: 0.75 , bumpMap: stoneBump, bumpScale: .015 });   // 미세한 표면 요철   // 유광: 바니시 바른 듯 매끈한 코팅 + 또렷한 반사
       mat.onBeforeCompile = sh => {              // 표본 채도 올림 (SATURATION: 1 = 원본)
         sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>',
           '#include <map_fragment>\n{ float l = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722)); diffuseColor.rgb = max(mix(vec3(l), diffuseColor.rgb, ' + SATURATION.toFixed(2) + '), 0.0); diffuseColor.rgb = clamp((diffuseColor.rgb - 0.5) * ' + CONTRAST.toFixed(2) + ' + 0.5, 0.0, 1.0); }');
@@ -502,6 +526,12 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
     });
   }
   const homeOf = st => [st.u * VW, st.v * VH];
+  // 판이 기울면 돌이 낮은 쪽으로 데구르르 (최대 돌 하나 크기), 기울기가 풀리면 제자리로
+  const ROLL = { REACH: 2.6, HZ: .62, DAMP: .45, TURN: .5 };   // 최대 거리(돌 반지름 배수) · 되돌아오는 빠르기 · 감쇠 · 구를 때 회전 정도
+  // 돌마다 조금씩 다르게 구름: 거리 · 반응 속도 · 출렁임 · 회전 정도/방향 · 방향 틀어짐
+  const rollOf = st => st.roll || (st.roll = (() => { const r = seeded(st.i + 31); return {
+    reach: .7 + r() * .6, hz: .75 + r() * .5, damp: .7 + r() * .6, turn: (.6 + r() * .8) * (r() < .3 ? -1 : 1), skew: (r() - .5) * .52 }; })());
+  const posOf = st => { const [hx, hy] = homeOf(st); return [hx + (st.rx || 0), hy + (st.ry || 0)]; };
 
   // ── 던지기: 화면 밖에서 굴러 들어와 마찰로 멈춤 ─────────────────────
   const THROW = 1.35;
@@ -523,10 +553,14 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
         st.mesh.visible = true; st.landed = false;
       });
       throwClock = 0; phaseThrow = true;
+      if (!reduced) { intro.on = true; intro.t = -1; cam.z = cam.tz = INTRO.Z; }
       requestFrame();
     });
   }
   let throwClock = 0, phaseThrow = false;
+  // 처음 줌: 돌이 떨어지는 동안 장면이 작게 보이다가, 다 떨어지면 잠깐 뒤 서서히 원래 크기로
+  const INTRO = { Z: .35, HOLD: 0, DUR: .5 };   // 처음 배율 · 다 떨어진 뒤 멈춤(초) · 커지는 시간(초)
+  const intro = { on: false, t: -1 };
   const easeOut3 = t => 1 - Math.pow(1 - t, 3), easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   const qTmp = new THREE.Quaternion(), qTilt = new THREE.Quaternion(), eTmp = new THREE.Euler();
   const xAxis = new THREE.Vector3(1, 0, 0), yAxis = new THREE.Vector3(0, 1, 0);
@@ -538,7 +572,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
   const nudge = { i: -1, t: 0, idle: 0, next: NUDGE.IDLE, k: -1, order: [0, 1, 2, 3, 4].sort(() => Math.random() - .5) };
   function stoneAt(x, y) {
     let best = -1, bd = 1e9; const R = stoneR();
-    stones.forEach((st, i) => { const [hx, hy] = homeOf(st); const d = Math.hypot(hx - x, hy - y); if (d < R * 1.35 && d < bd) { bd = d; best = i; } });
+    stones.forEach((st, i) => { const [hx, hy] = posOf(st); const d = Math.hypot(hx - x, hy - y); if (d < R * 1.35 && d < bd) { bd = d; best = i; } });
     return best;
   }
   // 화면 좌표 → 무대 좌표 (관찰 중 카메라 줌·이동을 되돌림)
@@ -551,7 +585,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
       return;
     }
     if (phase !== 'browse' || e.pointerType !== 'mouse') return;
-    const h = stoneAt(e.clientX, e.clientY);
+    const h = stoneAt(...toWorld(e.clientX, e.clientY));
     if (h !== hover) { hover = h; canvas.classList.toggle('hovering', h >= 0); }
     requestFrame();
   });
@@ -563,7 +597,8 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
       return;
     }
     if (phase !== 'browse') return;
-    const i = stoneAt(e.clientX, e.clientY);
+    if (downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 10) return;   // 끌어서 판을 기울인 거면 무시
+    const i = stoneAt(...toWorld(e.clientX, e.clientY));   // 화면이 커지는 중에도 정확한 돌
     if (i >= 0) observe(i);
   });
   let downAt = null;
@@ -822,6 +857,20 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
     mouseN = [Math.max(-1, Math.min(1, (e.clientX - VW / 2) / (VW / 2))), Math.max(-1, Math.min(1, (e.clientY - VH / 2) / (VH / 2)))];
     if (phase === 'split' || phase === 'browse') requestFrame();
   }, { passive: true });
+  // 터치: 빈 곳을 손가락으로 끌면 끈 방향 · 거리만큼 판이 기울어 돌이 구르고, 손을 떼면 제자리
+  let tiltTouch = null;
+  canvas.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' || (phase !== 'browse' && phase !== 'split')) return;
+    tiltTouch = { id: e.pointerId, x: e.clientX, y: e.clientY };
+  });
+  addEventListener('pointermove', e => {
+    if (!tiltTouch || e.pointerId !== tiltTouch.id) return;
+    const R = Math.min(VW, VH) * .25, cl = v => Math.max(-1, Math.min(1, v));   // 화면 짧은 변의 1/4을 끌면 최대로 기울어짐
+    mouseN = [cl((e.clientX - tiltTouch.x) / R), cl((e.clientY - tiltTouch.y) / R)];
+    requestFrame();
+  }, { passive: true });
+  const endTilt = e => { if (tiltTouch && e.pointerId === tiltTouch.id) { tiltTouch = null; mouseN = null; requestFrame(); } };
+  addEventListener('pointerup', endTilt); addEventListener('pointercancel', endTilt);
   const pivot = () => [VW * GRID.cx, VH * GRID.cy];
   // 기울어진 보드 위의 점을 화면(무대)으로: CSS perspective + rotateX/rotateY와 같은 계산
   function proj(x, y) {
@@ -905,10 +954,11 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
       const om = (2 * Math.PI) / 0.95, ze = 0.52;
       segEls.forEach(g => {
         if (tt < g.delay) { busy = true; return; }
-        if (reduced) { g.x = g.tx; g.y = g.ty; put(g); return; }
+        if (reduced) { g.x = g.tx; g.y = g.ty; g.rot = 0; put(g); return; }
         const ax = om * om * (g.tx - g.x) - 2 * ze * om * g.vx, ay = om * om * (g.ty - g.y) - 2 * ze * om * g.vy;
         g.vx += ax * dt; g.vy += ay * dt; g.x += g.vx * dt; g.y += g.vy * dt;
         if (Math.abs(g.tx - g.x) + Math.abs(g.ty - g.y) + Math.abs(g.vx) + Math.abs(g.vy) > 0.3) busy = true; else { g.x = g.tx; g.y = g.ty; g.vx = g.vy = 0; }
+        g.rot = (g.rot || 0) * Math.max(0, 1 - dt * 6); if (Math.abs(g.rot) > .01) busy = true; else g.rot = 0;   // 오프닝의 부채꼴 기울기는 갈라지면서 펴짐
         put(g);
       });
     }
@@ -929,7 +979,8 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
         if (p >= FALL && !st.landed) { st.landed = true; kickBoard(hx, hy); }
         const [qx, qy, qf] = proj(hx, hy);
         // 원근: 카메라보다 훨씬 위(뒤)에서 출발 → 카메라에 가까울수록 크고, 화면 가운데에서 멀리 밀려 보임
-        const s = 1 / (1 - DROP.C * h), sx = VW / 2 + (qx - VW / 2) * s, sy = VH / 2 + (qy - VH / 2) * s;
+        const Cz = 1 - (1 - DROP.C) * cam.z, s = 1 / (1 - Cz * h),   // 장면이 작게 보여도 카메라 위 같은 높이에서 떨어지도록 보정
+           sx = VW / 2 + (qx - VW / 2) * s, sy = VH / 2 + (qy - VH / 2) * s;
         st.mesh.position.copy(S(sx, sy)); st.mesh.position.z = 600 * h;
         st.mesh.scale.setScalar(stoneR() * s * qf);
         const op = Math.min(1, (1 - h) * 4);                                   // 카메라를 지나오는 동안엔 보이지 않다가 나타남
@@ -944,6 +995,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
       });
       if (all) {
         phaseThrow = false; phase = 'browse'; app.classList.add('is-browse');
+        if (intro.on) intro.t = -INTRO.HOLD;   // 잠깐 멈췄다가 커지기 시작
         stones.forEach(s => { s.btn.tabIndex = 0; });
         live.textContent = '다섯 표본이 놓였습니다. 표본을 눌러 가까이 살펴보세요.';
         if (ptr) { hover = stoneAt(ptr[0], ptr[1]); canvas.classList.toggle('hovering', hover >= 0); }
@@ -958,6 +1010,14 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
       stones[obs].mesh.quaternion.copy(dive.q0).slerp(dive.qFace, easeInOut(Math.min(1, p * 1.6)));
       if (p >= 0.78 && !dive.gifShown) { dive.gifShown = true; finishDive(); }
       if (p < 1) busy = true;
+    } else if (intro.on) {
+      if (!phaseThrow) {
+        intro.t += dt;
+        const u = Math.max(0, Math.min(1, intro.t / INTRO.DUR)), e = u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;   // 천천히 출발해 천천히 멈춤
+        cam.z = INTRO.Z + (1 - INTRO.Z) * e;
+        if (u >= 1) { intro.on = false; cam.z = cam.tz = 1; }
+      }
+      busy = true;
     } else if (phase !== 'question' && phase !== 'loading') {
       const tz = cam.tz * (phase === 'observe' ? zoomUser : 1), k = reduced ? 60 : 4.2;
       cam.x = follow(cam.x, cam.tx, k, dt); cam.y = follow(cam.y, cam.ty, k, dt); cam.z = follow(cam.z, tz, k, dt);
@@ -975,7 +1035,18 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
     // 놓인 표본: 호버 시 들림 · 포인터 쪽 기울기, 관찰 중 나머지는 옅게
     if (!phaseThrow) stones.forEach((st, i) => {
       if (!st.mesh.visible) return;
-      const [hx, hy] = homeOf(st), R = stoneR();
+      {   // 데구르르: 기울기 방향으로 끌리고, 스프링처럼 제자리로
+        const P = rollOf(st), R0 = stoneR(), w = 2 * Math.PI * ROLL.HZ * P.hz, free = phase === 'browse' && !reduced, dmp = ROLL.DAMP * P.damp;
+        const g = free ? w * w * ROLL.REACH * P.reach * R0 / Math.sin(BOARD.mouseTilt) : 0;
+        const gx = g * Math.sin(board.ay), gy = -g * Math.sin(board.ax), cs = Math.cos(P.skew), sn = Math.sin(P.skew);
+        const fx = gx * cs - gy * sn, fy = gx * sn + gy * cs, kk = free ? 1 : 3;   // 방향이 돌마다 살짝 틀어짐
+        st.vrx = (st.vrx || 0) + (fx - kk * w * w * (st.rx || 0) - 2 * dmp * w * kk * (st.vrx || 0)) * dt;
+        st.vry = (st.vry || 0) + (fy - kk * w * w * (st.ry || 0) - 2 * dmp * w * kk * (st.vry || 0)) * dt;
+        st.rx = (st.rx || 0) + st.vrx * dt; st.ry = (st.ry || 0) + st.vry * dt;
+        const lim = R0 * ROLL.REACH * P.reach * 1.15, L = Math.hypot(st.rx, st.ry); if (L > lim) { st.rx *= lim / L; st.ry *= lim / L; }
+        if (Math.abs(st.rx) + Math.abs(st.ry) + Math.abs(st.vrx) + Math.abs(st.vry) > .2) busy = true;
+      }
+      const [hx, hy] = posOf(st), R = stoneR();
       const lt = (phase === 'browse' && hover === i) ? 1 : 0;
       st.lift = reduced ? lt : follow(st.lift, lt, 8, dt);
       const ft = (phase === 'observe' || phase === 'dive') && i !== obs ? 1 : 0;
@@ -1000,7 +1071,7 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
         if (lt && ptr) { tx = Math.max(-1, Math.min(1, (ptr[0] - hx) / (R * 1.3))); ty = Math.max(-1, Math.min(1, (ptr[1] - hy) / (R * 1.3))); }
         st.tiltX = reduced ? ty * 0.3 : follow(st.tiltX || 0, ty * 0.3, 6, dt); st.tiltY = reduced ? tx * 0.34 : follow(st.tiltY || 0, tx * 0.34, 6, dt);
         if (Math.abs(st.tiltX - ty * 0.3) + Math.abs(st.tiltY - tx * 0.34) > 1e-3) busy = true;
-        eTmp.set(st.tiltX + rock * .6, st.tiltY + rock, rock * .5); qTilt.setFromEuler(eTmp);
+        eTmp.set(st.tiltX + rock * .6 - (st.ry || 0) / R * ROLL.TURN * rollOf(st).turn, st.tiltY + rock + (st.rx || 0) / R * ROLL.TURN * rollOf(st).turn, rock * .5 + ((st.rx || 0) - (st.ry || 0)) / R * .15 * rollOf(st).turn); qTilt.setFromEuler(eTmp);   // 구른 만큼 돌이 돌아감
         st.mesh.quaternion.copy(st.qFinal).premultiply(qTilt);
       }
       // 키보드용 버튼 위치
@@ -1046,6 +1117,8 @@ const ASSETS = {"blue-lace": "data:image/webp;base64,UklGRuizAABXRUJQVlA4INyzAAC
 
   addEventListener('resize', resize);
   resize();
+  // 오프닝부터 모눈종이가 작은 크기로 보임 (돌이 떨어질 자리)
+  if (!reduced) { cam.z = cam.tz = INTRO.Z; gridEl.classList.add('on'); gridEl.addEventListener('load', requestFrame); requestFrame(); }
   // 표본의 현재 화면 위치 (테스트·연결용)
   window.AgateIntro = { samples: SAMPLES, screenOf: i => { const [hx, hy] = homeOf(stones[i]); return [VW / 2 + (hx - cam.x) * cam.z, VH / 2 + (hy - cam.y) * cam.z]; }, state: () => ({ phase, obs }) };
 })();

@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>마노에 대하여</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="vendor/fonts.css">
 <style>
 /* 마노에 대하여 (흰 화면 · 익숙한 레이아웃): 가운데 검은 판 안에서 마노 5장이 lighten으로 겹쳐 있다가
@@ -69,7 +72,7 @@ body { margin: 0; background: var(--page); color: var(--ink); font-family: var(-
   const HOLD = 1600, STEP = 520, BOTTOM = 1400, DUR = .75;
   // 자리 (화면 비율, 시안 기준)
   const PANEL = { cx: .5, y: .068, h: .87 };       // 가운데 판: 가로 중심 · 위 · 높이 (너비는 사진 비율대로)
-  const INTRO = { hold: 1500, h: 1.0 };              // 처음: 화면 전체가 검고 사진이 화면 높이만큼 크게 → hold 뒤 판이 줄어듦
+  const INTRO = { hold: 500, h: 1.0 };              // 처음: 화면 전체가 검고 사진이 화면 높이만큼 크게 → hold 뒤 판이 줄어듦
   const THUMB = { cx: .842, cy: .507, w: .037, h: .087 };   // 오른쪽 작은 표본 (가운데 기준)
   const TEXT = { ttl: [.026, .365], p1: [.022, .46, -2.2], p2: [.02, .55, -2.6], w: .282, home: [.842, .855] };   // 왼쪽 글 · 버튼은 오른쪽 아래(표본 아래)
 
